@@ -1,0 +1,31 @@
+[tools]
+terraform = "1.14.8"
+pre-commit = "4.5.1"
+terraform-docs = "0.22.0"
+tflint = "0.61.0"
+trivy = "0.69.3"
+jq = "1.8.1"
+
+
+[tasks.init-dev]
+description = "Initilize Terraform"
+run = "terraform init -backend-config=../config/dev/backend.hcl"
+dir = "src"
+
+[tasks.plan-dev]
+description = "Plan Terraform"
+run = 'terraform plan -var-file="../config/dev/us-east-1.tfvars"'
+dir = "src"
+
+[tasks.apply-dev]
+description = "Plan Terraform"
+run = 'terraform apply -var-file="../config/dev/us-east-1.tfvars"'
+dir = "src"
+
+[tasks.pre-commit-install]
+description = "Install pre-commit"
+run = 'pre-commit install'
+
+[tasks.pre-commit]
+description = "Run pre-commit hook on all files"
+run = 'pre-commit run -a'

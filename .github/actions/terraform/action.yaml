@@ -1,0 +1,71 @@
+name: Terraform Action
+description: Run Terraform Plan or Apply
+
+inputs:
+  action:
+    description: "Terraform action to perform. Allowed values: plan, apply"
+    required: true
+  environment:
+    description: "Account name that is being deployed. Allowed values: DEV, PROD"
+    required: true
+  working_directory:
+    description: Path to the directory containing the terraform files
+    default: src
+  aws_region:
+    type: string
+    description: AWS region to use
+    required: true
+  tfconfig_path:
+    type: string
+    description: Path to the HCL file that configured Terraform backend
+    required: true
+  tfvars_path:
+    type: string
+    description: Path to the TFVARS file that contains the values for variables
+    required: true
+  aws_role_arn:
+    type: string
+    description: AWS IAM Role that will be used to assume a role using OIDC
+  github_token:
+    type: string
+    description: GitHub Token generated during GitHub Workflow runs used to comment the plan in the Pull Request. Only needed if 'action' is 'plan'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Mise
+      uses: jdx/mise-action@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v6
+      with:
+        role-to-assume: ${{ inputs.aws_role_arn }}
+        role-session-name: Github-Actions
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Initialize terraform
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: terraform init -backend-config=$GITHUB_WORKSPACE/${{ inputs.tfconfig_path }}
+
+    - name: Terraform Plan
+      if: ${{ inputs.action == 'plan' && github.ref != 'refs/heads/main' }}
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: terraform plan -var-file=$GITHUB_WORKSPACE/${{ inputs.tfvars_path }} -out .planfile
+
+    - name: Comment Terraform plan in PR
+      if: ${{ inputs.action == 'plan' && github.ref != 'refs/heads/main' }}
+      uses: borchero/terraform-plan-comment@v3
+      with:
+        working-directory: ${{ inputs.working_directory }}
+        token: ${{ inputs.github_token }}
+        planfile: .planfile
+        header: "[ ${{ inputs.environment }} - ${{ inputs.aws_region }}] Terraform Plan"
+
+    - name: Terraform Apply
+      if: ${{ inputs.action == 'apply' }}
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/${{ inputs.tfvars_path }}
