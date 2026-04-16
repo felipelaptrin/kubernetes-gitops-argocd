@@ -54,3 +54,23 @@ variable "k8s_addons_versions" {
     aws-ebs-csi-driver     = "v1.58.0-eksbuild.1"
   }
 }
+
+##############################
+##### ARGOCD / GITOPS
+##############################
+variable "argocd_chart_version" {
+  description = "Version of the argo-cd Helm chart used for the initial bootstrap installation only. Changing this after the first apply has no effect — ArgoCD manages its own upgrades via k8s/<env>/bootstrap/argocd-app.yaml."
+  type        = string
+  default     = "9.5.1"
+}
+
+variable "gitops_repo_url" {
+  description = "SSH URL of the Git repository that ArgoCD will watch for manifests (e.g. git@github.com:org/repo.git)"
+  type        = string
+}
+
+variable "gitops_repo_revision" {
+  description = "Git branch or tag ArgoCD will track"
+  type        = string
+  default     = "main"
+}

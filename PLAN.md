@@ -60,11 +60,9 @@ establishes the GitOps foundation.
 **Steps:**
 
 1. Terraform provisions the EKS cluster
-2. Terraform creates namespaces for all addons upfront — this avoids race conditions where
-   ArgoCD tries to create a namespace at the same moment an operator needs it to already exist
-3. Terraform installs ArgoCD via `helm_release` using the official `argo-cd` Helm chart
-4. Terraform creates the **cluster Secret** with infrastructure annotations (see section 2)
-5. Terraform applies a single root `Application` manifest pointing to `k8s/bootstrap/` in Git
+2. Terraform installs ArgoCD via `helm_release` using the official `argo-cd` Helm chart
+3. Terraform creates the **cluster Secret** with infrastructure annotations (see section 2)
+4. Terraform applies a single root `Application` manifest pointing to `k8s/bootstrap/` in Git
 
 From this point, ArgoCD takes over. Terraform's job is done until infrastructure changes.
 
@@ -355,18 +353,17 @@ kubernetes-bootstrap-argocd/
 │   ├── locals.tf
 │   ├── providers.tf
 │   ├── versions.tf
-│   ├── helm-values/
-│   │   └── argocd.yaml               # ArgoCD Helm values for initial bootstrap
 │   └── bootstrap/
 │       └── root-app.yaml             # Root Application (applied once by Terraform)
 │
 ├── k8s/
-│   ├── bootstrap/                    # ArgoCD self-management
-│   │   ├── argocd-app.yaml           # ArgoCD manages itself
-│   │   └── argocd-values.yaml        # ArgoCD Helm values (RBAC, repos, notifications)
-│   │
-│   └── addons/
-│       ├── applicationsets/          # One ApplicationSet per addon
+│   └── <env>/                        # One directory per environment (dev, prod, ...)
+│       ├── bootstrap/                # ArgoCD self-management
+│       │   ├── argocd-app.yaml       # ArgoCD manages itself
+│       │   └── argocd-values.yaml    # ArgoCD Helm values (RBAC, repos, notifications)
+│       │
+│       └── addons/
+│           ├── applicationsets/      # One ApplicationSet per addon
 │       │   ├── crds.yaml             # wave: -10
 │       │   ├── external-secrets.yaml # wave: -5
 │       │   ├── karpenter.yaml        # wave: 0
@@ -375,23 +372,23 @@ kubernetes-bootstrap-argocd/
 │       │   ├── external-dns.yaml     # wave: 5
 │       │   └── ...
 │       │
-│       ├── crds/                     # CRD-only manifests (no controllers)
-│       │   ├── karpenter/
-│       │   └── gateway-api/
-│       │
-│       ├── external-secrets/
-│       │   ├── values.yaml
-│       │   └── cluster-secret-store.yaml
-│       │
-│       ├── karpenter/
-│       │   └── values.yaml           # Static: tolerations, resource limits, log level
-│       │
-│       ├── alb-controller/
-│       │   └── values.yaml           # Static: image, resources, podDisruptionBudget
-│       │
-│       └── <addon>/
-│           ├── values.yaml
-│           └── external-secret.yaml  # Present only if addon needs secrets
+│           ├── crds/                 # CRD-only manifests (no controllers)
+│           │   ├── karpenter/
+│           │   └── gateway-api/
+│           │
+│           ├── external-secrets/
+│           │   ├── values.yaml
+│           │   └── cluster-secret-store.yaml
+│           │
+│           ├── karpenter/
+│           │   └── values.yaml       # Static: tolerations, resource limits, log level
+│           │
+│           ├── alb-controller/
+│           │   └── values.yaml       # Static: image, resources, podDisruptionBudget
+│           │
+│           └── <addon>/
+│               ├── values.yaml
+│               └── external-secret.yaml  # Present only if addon needs secrets
 │
 └── config/
     └── dev/
@@ -435,7 +432,7 @@ kubernetes-bootstrap-argocd/
 
 ### 9. Key Design Decisions
 
-- **Namespaces created by Terraform**, not ArgoCD — avoids first-sync race conditions
+- **Namespaces created by ArgoCD** via `CreateNamespace=true` sync option — Terraform only manages AWS infrastructure
 - **Terraform never writes to the Git repository** — clean separation of concerns
 - **No generated files in Git** — every file is human-authored and reviewable
 - **CRDs deployed separately** from their controllers — prevents sync failures on first install
