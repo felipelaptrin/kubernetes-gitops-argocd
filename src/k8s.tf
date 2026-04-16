@@ -50,7 +50,7 @@ resource "kubernetes_secret" "argocd_cluster" {
 ##### ROOT APPLICATION
 ##############################
 resource "kubernetes_manifest" "root_app" {
-  manifest = yamldecode(templatefile("${path.module}/bootstrap/root-app.yaml", {
+  manifest = yamldecode(templatefile("${path.module}/bootstrap/bootstrap.yaml", {
     gitops_repo_url      = var.gitops_repo_url
     gitops_repo_revision = var.gitops_repo_revision
     environment          = var.environment
