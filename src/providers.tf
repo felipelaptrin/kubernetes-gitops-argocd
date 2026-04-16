@@ -3,7 +3,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project = "Terraform CI/CD"
+      Project = "Kubernetes GitOps ArgoCD"
     }
   }
 }

@@ -16,16 +16,12 @@
 
 ## Modules
 
-| Name | Source | Version |
-| ---- | ------ | ------- |
-| <a name="module_bucket"></a> [bucket](#module\_bucket) | ../modules/bucket | n/a |
+No modules.
 
 ## Resources
 
 | Name | Type |
 | ---- | ---- |
-| [aws_sqs_queue.terraform_queue](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
-| [aws_ami.ubuntu](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 
 ## Inputs
@@ -39,5 +35,5 @@
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_ami"></a> [ami](#output\_ami) | n/a |
+| <a name="output_deployed_environment"></a> [deployed\_environment](#output\_deployed\_environment) | Account ID and Environment Name to be deployed |
 <!-- END_TF_DOCS -->
