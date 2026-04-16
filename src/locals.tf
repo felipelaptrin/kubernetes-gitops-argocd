@@ -8,4 +8,8 @@ locals {
   private_subnets  = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k)]
   public_subnets   = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 4)]
   database_subnets = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 8)]
+
+  # Kubernetes
+  k8s_cluster_name = local.prefix // This local var is created only to avoid cyclical dependency between vpc and eks modules
+
 }

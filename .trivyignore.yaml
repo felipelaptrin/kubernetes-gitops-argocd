@@ -1,9 +1,14 @@
 misconfigurations:
-  - id: AVD-AWS-0088
-    statement: Bucket does not have encryption enabled
+  - id: AWS-0040
+    statement: Public cluster access is enabled. | This is fine since we don't have VPN to access the cluster.
     paths:
-      - main.tf
-  - id: AVD-AWS-0132
-    statement: Bucket does not encrypt data with a customer managed key.
+      - terraform-aws-modules/eks/aws/main.tf
+  - id: AWS-0041
+    statement: Cluster allows access from a public CIDR (0.0.0.0/0). | This is fine since we don't have static public IP address.
     paths:
-      - main.tf
+      - terraform-aws-modules/eks/aws/main.tf
+  - id: AWS-0104
+    statement: Security group rule allows unrestricted egress to any IP address. | That's fine.
+    paths:
+      - terraform-aws-modules/eks/aws/main.tf
+      - terraform-aws-modules/eks/aws/node_groups.tf
