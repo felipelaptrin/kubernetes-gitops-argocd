@@ -3,14 +3,12 @@ kind: Application
 metadata:
   name: bootstrap
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: ${gitops_repo_url}
     targetRevision: ${gitops_repo_revision}
-    path: k8s/${environment}/bootstrap
+    path: k8s/bootstrap
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

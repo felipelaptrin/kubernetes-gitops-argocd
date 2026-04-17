@@ -74,3 +74,15 @@ variable "gitops_repo_revision" {
   type        = string
   default     = "main"
 }
+
+variable "gitops_addons_repo_path" {
+  description = "Git repository path for the addons"
+  type        = string
+  default     = "k8s/addons"
+}
+
+variable "gitops_apps_repo_path" {
+  description = "Git repository path for the applications"
+  type        = string
+  default     = "k8s/apps"
+}

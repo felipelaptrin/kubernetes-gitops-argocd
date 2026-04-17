@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: apps
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            managed: "true"
+  template:
+    metadata:
+      name: '{{metadata.annotations.environment}}-apps'
+    spec:
+      project: default
+      source:
+        repoURL: '{{metadata.annotations.gitops_repo_url}}'
+        path: '{{metadata.annotations.gitops_apps_repo_path}}'
+        targetRevision: '{{metadata.annotations.gitops_repo_revision}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

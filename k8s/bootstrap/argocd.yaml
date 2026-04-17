@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: argo-cd
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  generators:
+    - merge:
+        mergeKeys: [name]
+        generators:
+          - clusters:
+              values:
+                chart: argo-cd
+                chartVersion: 9.5.1
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+  template:
+    metadata:
+      name: "{{ metadata.annotations.environment }}-{{ values.chart }}"
+    spec:
+      project: default
+      sources:
+        - repoURL: https://argoproj.github.io/argo-helm
+          chart: '{{ values.chart }}'
+          targetRevision: '{{ values.chartVersion }}'
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/k8s/environments/default/addons/{{ values.chart }}/values.yaml
+              - $values/k8s/environments/{{ metadata.annotations.environment }}/addons/{{ values.chart }}/values.yaml
+        - repoURL: '{{ metadata.annotations.gitops_repo_url }}'
+          targetRevision: "{{ metadata.annotations.gitops_repo_revision }}"
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

@@ -114,10 +114,10 @@ resource "kubernetes_secret" "argocd_cluster" {
       "environment"                     = var.environment
     }
     annotations = {
-      "infra/vpc-id"           = module.vpc.vpc_id
-      "infra/aws-region"       = var.aws_region
+      "vpc_id"           = module.vpc.vpc_id
+      "aws-region"       = var.aws_region
       "infra/aws-account-id"   = data.aws_caller_identity.current.account_id
-      "infra/cluster-name"     = module.eks.cluster_name
+      "cluster-name"     = module.eks.cluster_name
       "infra/acm-cert-arn"     = module.acm.certificate_arn
       "infra/karpenter-queue"  = module.karpenter.queue_name
       # ... one annotation per Terraform output that addons need
@@ -161,9 +161,9 @@ spec:
           valueFiles:
             - values.yaml   # static values from Git
           values: |         # dynamic values from cluster annotations
-            vpcId: "{{ metadata.annotations['infra/vpc-id'] }}"
-            clusterName: "{{ metadata.annotations['infra/cluster-name'] }}"
-            region: "{{ metadata.annotations['infra/aws-region'] }}"
+            vpcId: "{{ metadata.annotations.vpc_id }}"
+            clusterName: "{{ metadata.annotations.cluster_name }}"
+            region: "{{ metadata.annotations.aws_region }}"
       destination:
         server: "{{ server }}"
         namespace: alb-controller

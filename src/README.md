@@ -22,6 +22,7 @@
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
+| <a name="module_alb_controller_pod_identity"></a> [alb\_controller\_pod\_identity](#module\_alb\_controller\_pod\_identity) | terraform-aws-modules/eks-pod-identity/aws | 2.7.0 |
 | <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | v21.18.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | v6.6.1 |
 
@@ -42,6 +43,8 @@
 | <a name="input_argocd_chart_version"></a> [argocd\_chart\_version](#input\_argocd\_chart\_version) | Version of the argo-cd Helm chart used for the initial bootstrap installation only. Changing this after the first apply has no effect — ArgoCD manages its own upgrades via k8s/<env>/bootstrap/argocd-app.yaml. | `string` | `"9.5.1"` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Region to deploy the resources | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name used to prefix resources | `string` | n/a | yes |
+| <a name="input_gitops_addons_repo_path"></a> [gitops\_addons\_repo\_path](#input\_gitops\_addons\_repo\_path) | Git repository path for the addons | `string` | `"k8s/addons"` | no |
+| <a name="input_gitops_apps_repo_path"></a> [gitops\_apps\_repo\_path](#input\_gitops\_apps\_repo\_path) | Git repository path for the applications | `string` | `"k8s/apps"` | no |
 | <a name="input_gitops_repo_revision"></a> [gitops\_repo\_revision](#input\_gitops\_repo\_revision) | Git branch or tag ArgoCD will track | `string` | `"main"` | no |
 | <a name="input_gitops_repo_url"></a> [gitops\_repo\_url](#input\_gitops\_repo\_url) | SSH URL of the Git repository that ArgoCD will watch for manifests (e.g. git@github.com:org/repo.git) | `string` | n/a | yes |
 | <a name="input_k8s_addons_versions"></a> [k8s\_addons\_versions](#input\_k8s\_addons\_versions) | EKS addons versions. Check the available versions on https://docs.aws.amazon.com/eks/latest/userguide/updating-an-add-on.html | <pre>object({<br/>    eks-pod-identity-agent = string<br/>    aws-ebs-csi-driver     = string<br/>  })</pre> | <pre>{<br/>  "aws-ebs-csi-driver": "v1.58.0-eksbuild.1",<br/>  "eks-pod-identity-agent": "v1.3.10-eksbuild.3"<br/>}</pre> | no |
