@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: aws-load-balancer-controller
+  namespace: argocd
+spec:
+  generators:
+    - merge:
+        mergeKeys: [name]
+        generators:
+          - clusters:
+              values:
+                chart: aws-load-balancer-controller
+                chartVersion: 3.2.1
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+  template:
+    metadata:
+      name: "{{ metadata.annotations.environment }}-{{ values.chart }}"
+      annotations:
+        argocd.argoproj.io/sync-wave: "1"
+    spec:
+      project: default
+      sources:
+        - repoURL: https://aws.github.io/eks-charts
+          chart: '{{ values.chart }}'
+          targetRevision: '{{ values.chartVersion }}'
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/k8s/environments/default/addons/{{ values.chart }}/values.yaml
+              - $values/k8s/environments/{{ metadata.annotations.environment }}/addons/{{ values.chart }}/values.yaml
+            values: |
+              aws:
+                vpcId: "{{ metadata.annotations.vpc_id }}"
+                region: "{{ metadata.annotations.aws_region }}"
+                clusterName: "{{ metadata.annotations.cluster_name }}"
+        - repoURL: '{{ metadata.annotations.gitops_repo_url }}'
+          targetRevision: "{{ metadata.annotations.gitops_repo_revision }}"
+          ref: values
+      destination:
+        name: "{{ name }}"
+        namespace: kube-system
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
