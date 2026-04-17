@@ -9,6 +9,10 @@ spec:
         mergeKeys: [name]
         generators:
           - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: Exists
               values:
                 chart: base
                 chartVersion: 1.29.2

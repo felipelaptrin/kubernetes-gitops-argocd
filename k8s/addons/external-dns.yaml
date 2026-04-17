@@ -9,6 +9,10 @@ spec:
         mergeKeys: [name]
         generators:
           - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: Exists
               values:
                 chart: external-dns
                 chartVersion: 1.20.0

@@ -9,6 +9,10 @@ spec:
         mergeKeys: [name]
         generators:
           - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: Exists
               values:
                 chart: aws-load-balancer-controller
                 chartVersion: 3.2.1
