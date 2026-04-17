@@ -1,0 +1,3 @@
+pilot:
+  autoscaleEnabled: false
+  replicaCount: 1
