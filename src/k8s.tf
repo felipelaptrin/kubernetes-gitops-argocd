@@ -87,10 +87,28 @@ module "external_secrets_pod_identity" {
 }
 
 ##############################
+##### EXTERNAL DNS IAM
+##############################
+module "external_dns_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "2.7.0"
+
+  name                       = "${local.prefix}-external-dns"
+  attach_external_dns_policy = true
+  associations = {
+    external_dns = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "external-dns"
+      service_account = "external-dns"
+    }
+  }
+}
+
+##############################
 ##### ROOT APPLICATION
 ##############################
 resource "kubernetes_manifest" "root_app" {
-  depends_on = [helm_release.argocd, kubernetes_secret.argocd_cluster, module.alb_controller_pod_identity, module.external_secrets_pod_identity]
+  depends_on = [helm_release.argocd, kubernetes_secret.argocd_cluster, module.alb_controller_pod_identity, module.external_secrets_pod_identity, module.external_dns_pod_identity]
 
   manifest = yamldecode(templatefile("${path.module}/bootstrap/bootstrap.yaml", {
     gitops_repo_url      = var.gitops_repo_url

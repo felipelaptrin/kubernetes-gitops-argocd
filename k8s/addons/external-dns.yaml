@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: external-dns
+  namespace: argocd
+spec:
+  generators:
+    - merge:
+        mergeKeys: [name]
+        generators:
+          - clusters:
+              values:
+                chart: external-dns
+                chartVersion: 1.20.0
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+  template:
+    metadata:
+      name: "{{ metadata.annotations.environment }}-{{ values.chart }}"
+    spec:
+      project: default
+      sources:
+        - repoURL: https://kubernetes-sigs.github.io/external-dns/
+          chart: '{{ values.chart }}'
+          targetRevision: '{{ values.chartVersion }}'
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/k8s/environments/default/addons/{{ values.chart }}/values.yaml
+              - $values/k8s/environments/{{ metadata.annotations.environment }}/addons/{{ values.chart }}/values.yaml
+            values: |
+              txtOwnerId: "{{ metadata.annotations.cluster_name }}"
+        - repoURL: '{{ metadata.annotations.gitops_repo_url }}'
+          targetRevision: "{{ metadata.annotations.gitops_repo_revision }}"
+          ref: values
+      destination:
+        name: "{{ name }}"
+        namespace: external-dns
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

@@ -1,0 +1,8 @@
+provider:
+  name: aws
+policy: sync
+serviceAccount:
+  create: true
+  name: external-dns
+sources:
+  - gateway-httproute
