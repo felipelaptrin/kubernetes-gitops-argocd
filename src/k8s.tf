@@ -68,10 +68,29 @@ module "alb_controller_pod_identity" {
 }
 
 ##############################
+##### EXTERNAL SECRETS IAM
+##############################
+module "external_secrets_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "2.7.0"
+
+  name                                  = "${local.prefix}-external-secrets"
+  attach_external_secrets_policy        = true
+  external_secrets_secrets_manager_arns = ["arn:aws:secretsmanager:${var.aws_region}:*:*:*"]
+  associations = {
+    external_secrets = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "external-secrets"
+      service_account = "external-secrets"
+    }
+  }
+}
+
+##############################
 ##### ROOT APPLICATION
 ##############################
 resource "kubernetes_manifest" "root_app" {
-  depends_on = [helm_release.argocd, kubernetes_secret.argocd_cluster, module.alb_controller_pod_identity]
+  depends_on = [helm_release.argocd, kubernetes_secret.argocd_cluster, module.alb_controller_pod_identity, module.external_secrets_pod_identity]
 
   manifest = yamldecode(templatefile("${path.module}/bootstrap/bootstrap.yaml", {
     gitops_repo_url      = var.gitops_repo_url
