@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: gateway-api
+  namespace: argocd
+spec:
+  generators:
+    - merge:
+        mergeKeys: [name]
+        generators:
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: Exists
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+  template:
+    metadata:
+      name: "{{ metadata.annotations.environment }}-gateway-api"
+    spec:
+      project: default
+      source:
+        repoURL: '{{ metadata.annotations.gitops_repo_url }}'
+        targetRevision: "{{ metadata.annotations.gitops_repo_revision }}"
+        path: k8s/environments/{{ metadata.annotations.environment }}/addons/gateway-api
+        kustomize:
+          patches:
+            - target:
+                kind: Gateway
+                name: shared-public-alb
+              patch: |
+                - op: replace
+                  path: /metadata/annotations/alb.ingress.kubernetes.io~1certificate-arn
+                  value: "{{ metadata.annotations.acm_certificate_arn }}"
+      destination:
+        name: "{{ name }}"
+        namespace: infra
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

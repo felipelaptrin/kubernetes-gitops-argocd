@@ -109,3 +109,16 @@ module "eks" {
     }
   }
 }
+
+##############################
+##### ACM
+##############################
+module "acm" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "6.3.0"
+
+  domain_name         = "*.${var.domain}"
+  zone_id             = data.aws_route53_zone.this.zone_id
+  validation_method   = "DNS"
+  wait_for_validation = true
+}

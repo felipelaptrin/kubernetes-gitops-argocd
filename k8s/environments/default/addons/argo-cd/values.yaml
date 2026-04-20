@@ -3,3 +3,15 @@ redis-ha:
 
 controller:
   replicas: 1
+
+server:
+  extraArgs:
+    - --insecure
+  httproute:
+    enabled: true
+    parentRefs:
+      - name: shared-public-alb
+        namespace: infra
+        sectionName: https
+    hostnames:
+      - "argocd.demosfelipetrindade.lat"

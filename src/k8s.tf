@@ -90,6 +90,8 @@ resource "kubernetes_secret_v1" "argocd_cluster" {
       "gitops_repo_revision"    = var.gitops_repo_revision
       "gitops_addons_repo_path" = var.gitops_addons_repo_path
       "gitops_apps_repo_path"   = var.gitops_apps_repo_path
+      "acm_certificate_arn"     = module.acm.acm_certificate_arn
+      "domain"                  = var.domain
     }
   }
 
