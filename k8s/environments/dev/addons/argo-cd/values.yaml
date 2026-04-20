@@ -1,3 +1,6 @@
+redis-ha:
+  enabled: false
+
 server:
   replicas: 1
 
