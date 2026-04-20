@@ -10,7 +10,9 @@ server:
   httproute:
     enabled: true
     parentRefs:
-      - name: shared-public-alb
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: shared-public-alb
         namespace: infra
         sectionName: https
     hostnames:
