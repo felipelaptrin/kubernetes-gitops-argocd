@@ -11,8 +11,9 @@ spec:
   generators:
     - clusters:
         selector:
-          matchLabels:
-            managed: "true"
+          matchExpressions:
+            - key: environment
+              operator: Exists
   template:
     metadata:
       name: '{{metadata.annotations.environment}}-addons'
