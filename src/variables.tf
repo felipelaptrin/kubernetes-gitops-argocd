@@ -56,6 +56,14 @@ variable "k8s_addons_versions" {
 }
 
 ##############################
+##### DNS
+##############################
+variable "domain" {
+  description = "Domain name of the Route53 hosted zone managed by External DNS"
+  type        = string
+}
+
+##############################
 ##### ARGOCD / GITOPS
 ##############################
 variable "argocd_chart_version" {

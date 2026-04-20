@@ -41,6 +41,7 @@
 | [tls_private_key.argocd_repo](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_route53_zone.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
 
@@ -48,6 +49,7 @@
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_argocd_chart_version"></a> [argocd\_chart\_version](#input\_argocd\_chart\_version) | Version of the argo-cd Helm chart used for the initial bootstrap installation only. Changing this after the first apply has no effect — ArgoCD manages its own upgrades via k8s/<env>/bootstrap/argocd-app.yaml. | `string` | `"9.5.1"` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Region to deploy the resources | `string` | n/a | yes |
+| <a name="input_domain"></a> [domain](#input\_domain) | Domain name of the Route53 hosted zone managed by External DNS | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name used to prefix resources | `string` | n/a | yes |
 | <a name="input_gitops_addons_repo_path"></a> [gitops\_addons\_repo\_path](#input\_gitops\_addons\_repo\_path) | Git repository path for the addons | `string` | `"k8s/addons"` | no |
 | <a name="input_gitops_apps_repo_path"></a> [gitops\_apps\_repo\_path](#input\_gitops\_apps\_repo\_path) | Git repository path for the applications | `string` | `"k8s/apps"` | no |

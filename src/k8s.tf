@@ -14,22 +14,28 @@ resource "helm_release" "argocd" {
 
   values = [
     yamlencode({
-      applications = [{
-        name      = "bootstrap"
-        namespace = "argocd"
-        project   = "default"
-        source = {
-          repoURL        = var.gitops_repo_url
-          targetRevision = var.gitops_repo_revision
-          path           = "k8s/bootstrap"
-        }
-        destination = {
-          server    = "https://kubernetes.default.svc"
+      extraObjects = [{
+        apiVersion = "argoproj.io/v1alpha1"
+        kind       = "Application"
+        metadata = {
+          name      = "bootstrap"
           namespace = "argocd"
         }
-        syncPolicy = {
-          automated   = { prune = true, selfHeal = true }
-          syncOptions = ["CreateNamespace=true"]
+        spec = {
+          project = "default"
+          source = {
+            repoURL        = var.gitops_repo_url
+            targetRevision = var.gitops_repo_revision
+            path           = "k8s/bootstrap"
+          }
+          destination = {
+            server    = "https://kubernetes.default.svc"
+            namespace = "argocd"
+          }
+          syncPolicy = {
+            automated   = { prune = true, selfHeal = true }
+            syncOptions = ["CreateNamespace=true"]
+          }
         }
       }]
     })
@@ -138,8 +144,9 @@ module "external_dns_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   version = "2.7.0"
 
-  name                       = substr("${local.prefix}-external-dns", 0, 37)
-  attach_external_dns_policy = true
+  name                          = substr("${local.prefix}-external-dns", 0, 37)
+  attach_external_dns_policy    = true
+  external_dns_hosted_zone_arns = [data.aws_route53_zone.this.arn]
   associations = {
     external_dns = {
       cluster_name    = module.eks.cluster_name
