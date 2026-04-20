@@ -49,6 +49,13 @@ spec:
                 - op: replace
                   path: /spec/securityGroupSelectorTerms/0/tags/karpenter.sh~1discovery
                   value: "{{ metadata.annotations.cluster_name }}"
+            - target:
+                kind: EC2NodeClass
+                name: default
+              patch: |
+                - op: replace
+                  path: /spec/tags/Name
+                  value: "karpenter-{{ metadata.annotations.cluster_name }}"
       destination:
         name: "{{ name }}"
         namespace: karpenter
