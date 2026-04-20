@@ -43,7 +43,7 @@ spec:
           ref: values
       destination:
         name: "{{ name }}"
-        namespace: kube-system
+        namespace: karpenter
       syncPolicy:
         automated:
           prune: true
