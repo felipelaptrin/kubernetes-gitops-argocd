@@ -58,6 +58,11 @@ spec:
           name: aws-load-balancer-webhook
           jqPathExpressions:
             - .webhooks[].clientConfig.caBundle
+        - kind: Secret
+          name: aws-load-balancer-tls
+          namespace: kube-system
+          jqPathExpressions:
+            - .data
       syncPolicy:
         automated:
           prune: true
