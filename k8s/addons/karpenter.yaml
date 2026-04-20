@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: karpenter
+  namespace: argocd
+spec:
+  generators:
+    - merge:
+        mergeKeys: [name]
+        generators:
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: Exists
+              values:
+                chart: karpenter
+                chartVersion: 1.11.1
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+  template:
+    metadata:
+      name: "{{ metadata.annotations.environment }}-{{ values.chart }}"
+    spec:
+      project: default
+      sources:
+        - repoURL: oci://public.ecr.aws/karpenter
+          chart: '{{ values.chart }}'
+          targetRevision: '{{ values.chartVersion }}'
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/k8s/environments/default/addons/{{ values.chart }}/values.yaml
+              - $values/k8s/environments/{{ metadata.annotations.environment }}/addons/{{ values.chart }}/values.yaml
+            values: |
+              settings:
+                clusterName: "{{ metadata.annotations.cluster_name }}"
+                interruptionQueue: "{{ metadata.annotations.karpenter_queue_name }}"
+        - repoURL: '{{ metadata.annotations.gitops_repo_url }}'
+          targetRevision: "{{ metadata.annotations.gitops_repo_revision }}"
+          ref: values
+      destination:
+        name: "{{ name }}"
+        namespace: kube-system
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

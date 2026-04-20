@@ -82,16 +82,18 @@ resource "kubernetes_secret_v1" "argocd_cluster" {
       "environment"                    = var.environment
     }
     annotations = {
-      "environment"             = var.environment
-      "vpc_id"                  = module.vpc.vpc_id
-      "aws_region"              = var.aws_region
-      "cluster_name"            = module.eks.cluster_name
-      "gitops_repo_url"         = var.gitops_repo_url
-      "gitops_repo_revision"    = var.gitops_repo_revision
-      "gitops_addons_repo_path" = var.gitops_addons_repo_path
-      "gitops_apps_repo_path"   = var.gitops_apps_repo_path
-      "acm_certificate_arn"     = module.acm.acm_certificate_arn
-      "domain"                  = var.domain
+      "environment"              = var.environment
+      "vpc_id"                   = module.vpc.vpc_id
+      "aws_region"               = var.aws_region
+      "cluster_name"             = module.eks.cluster_name
+      "gitops_repo_url"          = var.gitops_repo_url
+      "gitops_repo_revision"     = var.gitops_repo_revision
+      "gitops_addons_repo_path"  = var.gitops_addons_repo_path
+      "gitops_apps_repo_path"    = var.gitops_apps_repo_path
+      "acm_certificate_arn"      = module.acm.acm_certificate_arn
+      "domain"                   = var.domain
+      "karpenter_queue_name"     = module.karpenter.queue_name
+      "karpenter_node_role_name" = module.karpenter.node_iam_role_name
     }
   }
 
@@ -173,5 +175,22 @@ module "ebs_csi_driver_pod_identity" {
       namespace       = "kube-system"
       service_account = "ebs-csi-controller-sa"
     }
+  }
+}
+
+##############################
+##### KARPENTER
+##############################
+module "karpenter" {
+  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "21.18.0"
+
+  cluster_name         = module.eks.cluster_name
+  node_iam_role_arn    = module.eks.eks_managed_node_groups["general-purpose"].iam_role_arn
+  namespace            = "karpenter"
+  create_access_entry  = false
+  create_node_iam_role = false
+  node_iam_role_additional_policies = {
+    ssm = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   }
 }
