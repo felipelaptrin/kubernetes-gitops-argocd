@@ -93,7 +93,7 @@ resource "kubernetes_secret_v1" "argocd_cluster" {
       "acm_certificate_arn"      = module.acm.acm_certificate_arn
       "domain"                   = var.domain
       "karpenter_queue_name"     = module.karpenter.queue_name
-      "karpenter_node_role_name" = module.karpenter.node_iam_role_name
+      "karpenter_node_role_name" = local.karpenter_node_role_name
     }
   }
 

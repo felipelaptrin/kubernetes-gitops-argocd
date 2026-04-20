@@ -10,6 +10,7 @@ locals {
   database_subnets = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 8)]
 
   # Kubernetes
-  k8s_cluster_name = local.prefix // This local var is created only to avoid cyclical dependency between vpc and eks modules
+  k8s_cluster_name         = local.prefix // This local var is created only to avoid cyclical dependency between vpc and eks modules
+  karpenter_node_role_name = module.eks.eks_managed_node_groups["general-purpose"].iam_role_name
 
 }
