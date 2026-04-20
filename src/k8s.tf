@@ -12,6 +12,29 @@ resource "helm_release" "argocd" {
   create_namespace = true
   wait             = true
 
+  values = [
+    yamlencode({
+      applications = [{
+        name      = "bootstrap"
+        namespace = "argocd"
+        project   = "default"
+        source = {
+          repoURL        = var.gitops_repo_url
+          targetRevision = var.gitops_repo_revision
+          path           = "k8s/bootstrap"
+        }
+        destination = {
+          server    = "https://kubernetes.default.svc"
+          namespace = "argocd"
+        }
+        syncPolicy = {
+          automated   = { prune = true, selfHeal = true }
+          syncOptions = ["CreateNamespace=true"]
+        }
+      }]
+    })
+  ]
+
   lifecycle {
     ignore_changes = all
   }
@@ -78,7 +101,7 @@ module "alb_controller_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   version = "2.7.0"
 
-  name                            = "${local.prefix}-alb-controller"
+  name                            = substr("${local.prefix}-alb-controller", 0, 37)
   attach_aws_lb_controller_policy = true
   associations = {
     alb_controller = {
@@ -96,7 +119,7 @@ module "external_secrets_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   version = "2.7.0"
 
-  name                                  = "${local.prefix}-external-secrets"
+  name                                  = substr("${local.prefix}-external-secrets", 0, 37)
   attach_external_secrets_policy        = true
   external_secrets_secrets_manager_arns = ["arn:aws:secretsmanager:${var.aws_region}:*:*:*"]
   associations = {
@@ -115,7 +138,7 @@ module "external_dns_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   version = "2.7.0"
 
-  name                       = "${local.prefix}-external-dns"
+  name                       = substr("${local.prefix}-external-dns", 0, 37)
   attach_external_dns_policy = true
   associations = {
     external_dns = {
@@ -142,18 +165,4 @@ module "ebs_csi_driver_pod_identity" {
       service_account = "ebs-csi-controller-sa"
     }
   }
-}
-
-##############################
-##### ROOT APPLICATION
-##############################
-resource "kubernetes_manifest" "root_app" {
-  depends_on = [helm_release.argocd, kubernetes_secret_v1.argocd_cluster, kubernetes_secret_v1.argocd_repo]
-
-  manifest = yamldecode(templatefile("${path.module}/bootstrap/bootstrap.yaml", {
-    gitops_repo_url      = var.gitops_repo_url
-    gitops_repo_revision = var.gitops_repo_revision
-    environment          = var.environment
-  }))
-
 }

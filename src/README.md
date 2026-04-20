@@ -36,7 +36,6 @@
 | Name | Type |
 | ---- | ---- |
 | [helm_release.argocd](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [kubernetes_manifest.root_app](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
 | [kubernetes_secret_v1.argocd_cluster](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1) | resource |
 | [kubernetes_secret_v1.argocd_repo](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1) | resource |
 | [tls_private_key.argocd_repo](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
