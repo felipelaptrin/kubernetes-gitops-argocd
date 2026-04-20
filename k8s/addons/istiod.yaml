@@ -40,6 +40,14 @@ spec:
       destination:
         name: "{{ name }}"
         namespace: istio-system
+      # istiod mutates failurePolicy from Ignore to Fail at runtime when ready
+      # https://github.com/istio/istio/issues/52785
+      ignoreDifferences:
+        - group: admissionregistration.k8s.io
+          kind: ValidatingWebhookConfiguration
+          name: istio-validator-istio-system
+          jsonPointers:
+            - /webhooks/0/failurePolicy
       syncPolicy:
         automated:
           prune: true
