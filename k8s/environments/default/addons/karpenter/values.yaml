@@ -1,6 +1,11 @@
 serviceAccount:
   create: true
   name: karpenter
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Equal
+    value: "true"
+    effect: NoSchedule
 controller:
   resources:
     requests:

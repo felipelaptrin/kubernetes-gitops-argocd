@@ -11,6 +11,6 @@ locals {
 
   # Kubernetes
   k8s_cluster_name         = local.prefix // This local var is created only to avoid cyclical dependency between vpc and eks modules
-  karpenter_node_role_name = module.eks.eks_managed_node_groups["general-purpose"].iam_role_name
+  karpenter_node_role_name = module.eks.eks_managed_node_groups["critical-addons"].iam_role_name
 
 }

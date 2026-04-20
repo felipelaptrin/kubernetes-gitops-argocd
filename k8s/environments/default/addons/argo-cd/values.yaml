@@ -1,3 +1,10 @@
+global:
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
 redis-ha:
   enabled: true
 

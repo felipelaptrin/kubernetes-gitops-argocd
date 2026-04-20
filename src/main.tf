@@ -79,7 +79,7 @@ module "eks" {
 
   # Using EKS-Optimized Images: https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/
   eks_managed_node_groups = {
-    general-purpose = {
+    critical-addons = {
       ami_type = "AL2023_ARM_64_STANDARD"
       instance_types = [
         "m6g.large"
@@ -94,6 +94,13 @@ module "eks" {
       }
       iam_role_additional_policies = {
         ssm = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
+      taints = {
+        critical_addons_only = {
+          key    = "CriticalAddonsOnly" # Reference: https://docs.aws.amazon.com/eks/latest/userguide/critical-workload.html
+          value  = "true"
+          effect = "NO_SCHEDULE"
+        }
       }
     }
   }

@@ -14,6 +14,14 @@ resource "helm_release" "argocd" {
 
   values = [
     yamlencode({
+      global = {
+        tolerations = [{
+          key      = "CriticalAddonsOnly"
+          operator = "Equal"
+          value    = "true"
+          effect   = "NoSchedule"
+        }]
+      }
       extraObjects = [{
         apiVersion = "argoproj.io/v1alpha1"
         kind       = "Application"
@@ -186,7 +194,7 @@ module "karpenter" {
   version = "21.18.0"
 
   cluster_name         = module.eks.cluster_name
-  node_iam_role_arn    = module.eks.eks_managed_node_groups["general-purpose"].iam_role_arn
+  node_iam_role_arn    = module.eks.eks_managed_node_groups["critical-addons"].iam_role_arn
   namespace            = "karpenter"
   create_access_entry  = false
   create_node_iam_role = false
