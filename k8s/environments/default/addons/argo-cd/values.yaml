@@ -7,13 +7,3 @@ controller:
 server:
   extraArgs:
     - --insecure
-  httproute:
-    enabled: true
-    parentRefs:
-      - group: gateway.networking.k8s.io
-        kind: Gateway
-        name: shared-public-nlb
-        namespace: istio-system
-        sectionName: https
-    hostnames:
-      - "argocd.demosfelipetrindade.lat"
