@@ -30,14 +30,14 @@ spec:
           patches:
             - target:
                 kind: Gateway
-                name: shared-public-alb
+                name: shared-public-nlb
               patch: |
                 - op: replace
-                  path: /metadata/annotations/alb.ingress.kubernetes.io~1certificate-arn
+                  path: /spec/infrastructure/annotations/service.beta.kubernetes.io~1aws-load-balancer-ssl-cert
                   value: "{{ metadata.annotations.acm_certificate_arn }}"
       destination:
         name: "{{ name }}"
-        namespace: infra
+        namespace: istio-system
       syncPolicy:
         automated:
           prune: true

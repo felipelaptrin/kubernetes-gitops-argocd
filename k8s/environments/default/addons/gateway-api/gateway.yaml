@@ -1,17 +1,17 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: shared-public-alb
-  namespace: infra
-  annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/certificate-arn: "PLACEHOLDER"
-    alb.ingress.kubernetes.io/ssl-redirect: "443"
-    alb.ingress.kubernetes.io/load-balancer-name: "k8s-shared-public-alb"
-    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+  name: shared-public-nlb
+  namespace: istio-system
 spec:
-  gatewayClassName: alb
+  gatewayClassName: istio
+  infrastructure:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "external"
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "PLACEHOLDER"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
   listeners:
     - name: http
       port: 80
@@ -19,15 +19,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    # TLS is terminated at the NLB (via ACM), so Istio receives plain HTTP on port 443.
     - name: https
       port: 443
-      protocol: HTTPS
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - kind: Secret
-            name: unused
-            group: ""
+      protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
