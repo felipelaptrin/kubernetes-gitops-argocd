@@ -26,8 +26,8 @@ spec:
     spec:
       project: default
       sources:
-        - repoURL: oci://public.ecr.aws/karpenter
-          chart: '{{ values.chart }}'
+        - repoURL: oci://public.ecr.aws/karpenter/karpenter
+          chart: karpenter
           targetRevision: '{{ values.chartVersion }}'
           helm:
             ignoreMissingValueFiles: true
