@@ -5,7 +5,7 @@ metadata:
 spec:
   role: PLACEHOLDER
   amiSelectorTerms:
-    - alias: al2023@v2025
+    - alias: al2023@v20260415
   subnetSelectorTerms:
     - tags:
         karpenter.sh/discovery: PLACEHOLDER
