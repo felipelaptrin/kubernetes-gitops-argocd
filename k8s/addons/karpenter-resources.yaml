@@ -51,7 +51,7 @@ spec:
                   value: "{{ metadata.annotations.cluster_name }}"
       destination:
         name: "{{ name }}"
-        namespace: kube-system
+        namespace: karpenter
       syncPolicy:
         automated:
           prune: true
