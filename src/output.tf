@@ -12,3 +12,8 @@ output "k8s_cluster_name" {
   description = "EKS cluster name"
   value       = module.eks.cluster_name
 }
+
+output "argocd_deploy_public_key" {
+  description = "SSH public key to add as a read-only deploy key in the GitHub repository"
+  value       = tls_private_key.argocd_repo.public_key_openssh
+}

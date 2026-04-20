@@ -9,6 +9,7 @@
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.31 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | ~> 3.1 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | ~> 3.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 4.0 |
 
 ## Providers
 
@@ -17,12 +18,14 @@
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.31 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | ~> 3.1 |
 | <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | ~> 3.0 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | ~> 4.0 |
 
 ## Modules
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
 | <a name="module_alb_controller_pod_identity"></a> [alb\_controller\_pod\_identity](#module\_alb\_controller\_pod\_identity) | terraform-aws-modules/eks-pod-identity/aws | 2.7.0 |
+| <a name="module_ebs_csi_driver_pod_identity"></a> [ebs\_csi\_driver\_pod\_identity](#module\_ebs\_csi\_driver\_pod\_identity) | terraform-aws-modules/eks-pod-identity/aws | 2.7.0 |
 | <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | v21.18.0 |
 | <a name="module_external_dns_pod_identity"></a> [external\_dns\_pod\_identity](#module\_external\_dns\_pod\_identity) | terraform-aws-modules/eks-pod-identity/aws | 2.7.0 |
 | <a name="module_external_secrets_pod_identity"></a> [external\_secrets\_pod\_identity](#module\_external\_secrets\_pod\_identity) | terraform-aws-modules/eks-pod-identity/aws | 2.7.0 |
@@ -34,7 +37,9 @@
 | ---- | ---- |
 | [helm_release.argocd](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_manifest.root_app](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
-| [kubernetes_secret.argocd_cluster](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
+| [kubernetes_secret_v1.argocd_cluster](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1) | resource |
+| [kubernetes_secret_v1.argocd_repo](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1) | resource |
+| [tls_private_key.argocd_repo](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 
@@ -59,6 +64,7 @@
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_argocd_deploy_public_key"></a> [argocd\_deploy\_public\_key](#output\_argocd\_deploy\_public\_key) | SSH public key to add as a read-only deploy key in the GitHub repository |
 | <a name="output_deployed_environment"></a> [deployed\_environment](#output\_deployed\_environment) | Account ID and Environment Name deployed |
 | <a name="output_k8s_cluster_name"></a> [k8s\_cluster\_name](#output\_k8s\_cluster\_name) | EKS cluster name |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | VPC ID |

@@ -17,10 +17,32 @@ resource "helm_release" "argocd" {
   }
 }
 
+resource "tls_private_key" "argocd_repo" {
+  algorithm = "ED25519"
+}
+
+resource "kubernetes_secret_v1" "argocd_repo" {
+  depends_on = [helm_release.argocd]
+
+  metadata {
+    name      = "gitops-repo-ssh-key"
+    namespace = helm_release.argocd.namespace
+    labels = {
+      "argocd.argoproj.io/secret-type" = "repository"
+    }
+  }
+
+  data = {
+    type          = "git"
+    url           = var.gitops_repo_url
+    sshPrivateKey = tls_private_key.argocd_repo.private_key_openssh
+  }
+}
+
 ##############################
 ##### GITOPS BRIDGE - CLUSTER SECRET
 ##############################
-resource "kubernetes_secret" "argocd_cluster" {
+resource "kubernetes_secret_v1" "argocd_cluster" {
   depends_on = [helm_release.argocd]
 
   metadata {
@@ -105,10 +127,28 @@ module "external_dns_pod_identity" {
 }
 
 ##############################
+##### AWS EBS CSI DRIVER IAM
+##############################
+module "ebs_csi_driver_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "2.7.0"
+
+  name                      = substr("${local.prefix}-ebs-csi-driver", 0, 37)
+  attach_aws_ebs_csi_policy = true
+  associations = {
+    ebs_csi_driver = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "kube-system"
+      service_account = "ebs-csi-controller-sa"
+    }
+  }
+}
+
+##############################
 ##### ROOT APPLICATION
 ##############################
 resource "kubernetes_manifest" "root_app" {
-  depends_on = [helm_release.argocd, kubernetes_secret.argocd_cluster, module.alb_controller_pod_identity, module.external_secrets_pod_identity, module.external_dns_pod_identity]
+  depends_on = [helm_release.argocd, kubernetes_secret_v1.argocd_cluster, kubernetes_secret_v1.argocd_repo]
 
   manifest = yamldecode(templatefile("${path.module}/bootstrap/bootstrap.yaml", {
     gitops_repo_url      = var.gitops_repo_url
