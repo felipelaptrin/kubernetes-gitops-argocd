@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: storage-class
+  namespace: argocd
+spec:
+  generators:
+    - merge:
+        mergeKeys: [name]
+        generators:
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: Exists
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+  template:
+    metadata:
+      name: "{{ metadata.annotations.environment }}-storage-class"
+    spec:
+      project: default
+      source:
+        repoURL: '{{ metadata.annotations.gitops_repo_url }}'
+        targetRevision: "{{ metadata.annotations.gitops_repo_revision }}"
+        path: k8s/environments/{{ metadata.annotations.environment }}/addons/storage-class
+      destination:
+        name: "{{ name }}"
+        namespace: kube-system
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
