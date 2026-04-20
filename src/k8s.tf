@@ -22,36 +22,46 @@ resource "helm_release" "argocd" {
           effect   = "NoSchedule"
         }]
       }
-      extraObjects = [{
-        apiVersion = "argoproj.io/v1alpha1"
-        kind       = "Application"
-        metadata = {
-          name      = "bootstrap"
-          namespace = "argocd"
-        }
-        spec = {
-          project = "default"
-          source = {
-            repoURL        = var.gitops_repo_url
-            targetRevision = var.gitops_repo_revision
-            path           = "k8s/bootstrap"
-          }
-          destination = {
-            server    = "https://kubernetes.default.svc"
-            namespace = "argocd"
-          }
-          syncPolicy = {
-            automated   = { prune = true, selfHeal = true }
-            syncOptions = ["CreateNamespace=true"]
-          }
-        }
-      }]
     })
   ]
 
   lifecycle {
     ignore_changes = all
   }
+}
+
+# kubectl_manifest is used here instead of kubernetes_manifest because on the
+# first apply ArgoCD is not yet installed, so its CRDs do not exist. The
+# kubernetes provider validates CRD schemas at plan time and would fail.
+# kubectl_manifest defers validation to apply time, after helm_release.argocd
+# has installed the CRDs.
+resource "kubectl_manifest" "argocd_bootstrap_app" {
+  depends_on = [helm_release.argocd]
+
+  yaml_body = yamlencode({
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "bootstrap"
+      namespace = "argocd"
+    }
+    spec = {
+      project = "default"
+      source = {
+        repoURL        = var.gitops_repo_url
+        targetRevision = var.gitops_repo_revision
+        path           = "k8s/bootstrap"
+      }
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = "argocd"
+      }
+      syncPolicy = {
+        automated   = { prune = true, selfHeal = true }
+        syncOptions = ["CreateNamespace=true"]
+      }
+    }
+  })
 }
 
 resource "tls_private_key" "argocd_repo" {
