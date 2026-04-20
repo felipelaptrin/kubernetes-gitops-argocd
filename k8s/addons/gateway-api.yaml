@@ -20,6 +20,8 @@ spec:
   template:
     metadata:
       name: "{{ metadata.annotations.environment }}-gateway-api"
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
     spec:
       project: default
       source:
