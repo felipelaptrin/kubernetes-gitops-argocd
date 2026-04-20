@@ -18,8 +18,13 @@ run = 'terraform plan -var-file="../config/dev/us-east-1.tfvars"'
 dir = "src"
 
 [tasks.apply-dev]
-description = "Plan Terraform"
+description = "Apply Terraform"
 run = 'terraform apply -var-file="../config/dev/us-east-1.tfvars"'
+dir = "src"
+
+[tasks.apply-dev-bootstrap]
+description = "Apply Terraform bootstrap (create K8S cluster without first)" # This is a limitation of K8S cluster that needs K8S cluster to be in place first
+run = 'terraform apply -var-file="../config/dev/us-east-1.tfvars" -target=module.vpc -target=module.eks -target=module.ebs_csi_driver_pod_identity'
 dir = "src"
 
 [tasks.pre-commit-install]
