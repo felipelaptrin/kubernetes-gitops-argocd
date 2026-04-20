@@ -37,10 +37,9 @@ spec:
               - $values/k8s/environments/default/addons/{{ values.chart }}/values.yaml
               - $values/k8s/environments/{{ metadata.annotations.environment }}/addons/{{ values.chart }}/values.yaml
             values: |
-              aws:
-                vpcId: "{{ metadata.annotations.vpc_id }}"
-                region: "{{ metadata.annotations.aws_region }}"
-                clusterName: "{{ metadata.annotations.cluster_name }}"
+              clusterName: "{{ metadata.annotations.cluster_name }}"
+              vpcId: "{{ metadata.annotations.vpc_id }}"
+              region: "{{ metadata.annotations.aws_region }}"
         - repoURL: '{{ metadata.annotations.gitops_repo_url }}'
           targetRevision: "{{ metadata.annotations.gitops_repo_revision }}"
           ref: values
