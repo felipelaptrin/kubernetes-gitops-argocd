@@ -46,6 +46,18 @@ spec:
       destination:
         name: "{{ name }}"
         namespace: kube-system
+      # LBC self-manages its TLS cert and patches caBundle into webhooks at runtime
+      ignoreDifferences:
+        - group: admissionregistration.k8s.io
+          kind: MutatingWebhookConfiguration
+          name: aws-load-balancer-webhook
+          jqPathExpressions:
+            - .webhooks[].clientConfig.caBundle
+        - group: admissionregistration.k8s.io
+          kind: ValidatingWebhookConfiguration
+          name: aws-load-balancer-webhook
+          jqPathExpressions:
+            - .webhooks[].clientConfig.caBundle
       syncPolicy:
         automated:
           prune: true
