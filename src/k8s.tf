@@ -1,6 +1,9 @@
 ##############################
 ##### ARGOCD
 ##############################
+# This is a "ghost resource" because of its lifecycle rule
+# The idea is that this will only be used once, during EKS bootstrap
+# After that ArgoCD will manage itself (please check k8s/bootstrap/argocd.yaml file)
 resource "helm_release" "argocd" {
   depends_on = [module.eks]
 
