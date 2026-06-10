@@ -39,3 +39,17 @@ From now on, no need to run bootstrap anymore! Every future deployment can run d
 7) Add Deploy key to GitHub Repository
 
 The Terraform created the SSH key to be used by ArgoCD in order to pull the repository (if it's private). Basically you should copy the output of `argocd_deploy_public_key` and add it as a `Deploy Key` in your repository.
+
+8) Get ArgoCD Admin Password
+
+```sh
+mise run update-kubeconfig
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+```
+
+9) Access ArgoCD UI
+
+The URL will be `argocd.<DOMAIN>`, where the domain is the domain set in the `config/dev/us-east-1.tfvars` file.
+
+Use username `admin` and password the value you got from the previous step (STEP 8)

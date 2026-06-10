@@ -31,6 +31,20 @@ dir = "src"
 description = "Install pre-commit"
 run = 'pre-commit install'
 
+[tasks.update-kubeconfig]
+description = "Update kubeconfig with EKS cluster credentials"
+run = """
+CLUSTER_NAME=$(terraform output -raw k8s_cluster_name)
+AWS_REGION=$(terraform output -raw aws_region)
+aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "$AWS_REGION"
+"""
+dir = "src"
+
+[tasks.destroy-dev]
+description = "Destroy all Terraform-managed infrastructure in dev"
+run = 'terraform destroy -var-file="../config/dev/us-east-1.tfvars"'
+dir = "src"
+
 [tasks.pre-commit]
 description = "Run pre-commit hook on all files"
 run = 'pre-commit run -a'

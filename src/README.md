@@ -71,6 +71,7 @@
 | Name | Description |
 | ---- | ----------- |
 | <a name="output_argocd_deploy_public_key"></a> [argocd\_deploy\_public\_key](#output\_argocd\_deploy\_public\_key) | SSH public key to add as a read-only deploy key in the GitHub repository |
+| <a name="output_aws_region"></a> [aws\_region](#output\_aws\_region) | AWS region |
 | <a name="output_deployed_environment"></a> [deployed\_environment](#output\_deployed\_environment) | Account ID and Environment Name deployed |
 | <a name="output_k8s_cluster_name"></a> [k8s\_cluster\_name](#output\_k8s\_cluster\_name) | EKS cluster name |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | VPC ID |

@@ -1,3 +1,8 @@
+output "aws_region" {
+  description = "AWS region"
+  value       = var.aws_region
+}
+
 output "deployed_environment" {
   description = "Account ID and Environment Name deployed"
   value       = "Environment [${var.environment}] => Account ${local.account_id}"
